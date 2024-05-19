@@ -6,6 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
+#include <cstdlib>
 
 using std::make_unique;
 using std::vector;
@@ -109,8 +110,8 @@ map<float, vector<vector<int>>> GA::calcRouletteFitness(vector<vector<int>> cons
     return rouletteFitToChromosomeMap;
 }
 
-vector<vector<int>> GA::selection(vector<vector<int>> const& chromosomePool) {
-    map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(chromosomePool);
+vector<vector<int>> GA::selection(map<float, vector<vector<int>>> const&  fitnessToChromosomeMap) {
+    // map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(chromosomePool);
     vector<vector<int>> selectedChromosomes;
 
     while(selectedChromosomes.size() < chromosomeSize) {
@@ -122,10 +123,12 @@ vector<vector<int>> GA::selection(vector<vector<int>> const& chromosomePool) {
 
             sumFitness += fitness;
             if (chance < sumFitness) {
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<> dis(0, chromosomes.size() - 1);
-                vector<int> selectedChromosome = chromosomes[dis(gen)];
+                // std::random_device rd;
+                // std::mt19937 gen(rd());
+                // std::uniform_int_distribution<> dis(0, chromosomes.size() - 1);  
+                // vector<int> selectedChromosome = chromosomes[dis(gen)];
+                int index = static_cast<int>(rand() % (chromosomes.size()));
+                vector<int> selectedChromosome = chromosomes[index];
                 selectedChromosomes.push_back(selectedChromosome);
                 break;
             }
@@ -135,28 +138,26 @@ vector<vector<int>> GA::selection(vector<vector<int>> const& chromosomePool) {
     return selectedChromosomes;
 }
 
-void GA::singlePointCrossover(vector<int> const& firstChromo, vector<int> const& secondChromo) {
-    for (int i = 0; i < firstChromo.size(); i++) {
-        cout << firstChromo[i] << " " << endl;
+void GA::singlePointCrossover(vector<int>& firstChromo, vector<int>& secondChromo) {
+    int splicePoint = static_cast<int>(rand() % (chromosomeSize));
+    for (int i = 0; i < chromosomeSize; i++) {
+        if (splicePoint < i) {
+            std::swap(firstChromo[i], secondChromo[i]);
+        }
     }
-    cout << "\n" << endl;
-    for (int i = 0; i < secondChromo.size(); i++) {
-        cout << secondChromo[i] << " " << endl;
-    }
-    cout << "\n" << endl;
 }
 
-void GA::crossover(vector<vector<int>> const& chromosomePool) {
+void GA::crossover(vector<vector<int>>& chromosomePool) {
     int halfwayIndex = static_cast<int>(chromosomeSize / 2);
     for (int i = 0; i < halfwayIndex; i++) {
         singlePointCrossover(chromosomePool[i], chromosomePool[i+halfwayIndex]);
     }
-    auto test = chromosomePool[0];
 }
 
 void GA::runAlgorithm(int iterations) {
-    float fitness = fitnessFunction(chromosomePool->at(0));
-    vector<vector<int>> selectedChromosomes = selection(*chromosomePool);
+    map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(*chromosomePool);
+
+    vector<vector<int>> selectedChromosomes = selection(fitnessToChromosomeMap);
     crossover(selectedChromosomes);
 }
 

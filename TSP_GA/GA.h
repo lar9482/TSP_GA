@@ -21,10 +21,10 @@ private:
 	void initializeAdjacencyMatrix(string adjacencyMatrixPath);
 	float fitnessFunction(std::vector<int> const& chromosome);
 	map<float, vector<vector<int>>> calcRouletteFitness(vector<vector<int>> const& chromosomePool);
-	void singlePointCrossover(vector<int> const& firstChromo, vector<int> const& secondChromo);
+	void singlePointCrossover(vector<int>& firstChromo, vector<int>& secondChromo);
 
-	vector<vector<int>> selection(vector<vector<int>> const& chromosomePool);
-	void crossover(vector<vector<int>> const& chromosomePool);
+	vector<vector<int>> selection(map<float, vector<vector<int>>> const& fitnessToChromosomeMap);
+	void crossover(vector<vector<int>>& chromosomePool);
 
 public:
 	GA(int poolSize, std::string adjacencyMatrixPath);
