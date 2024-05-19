@@ -16,6 +16,7 @@ private:
 	unique_ptr<vector<vector<int>> > adjacencyMatrix;
 	int poolSize;
 	int chromosomeSize;
+	float mutationRate;
 
 	void initializeChromosomePool();
 	void initializeAdjacencyMatrix(string adjacencyMatrixPath);
@@ -27,7 +28,7 @@ private:
 	void crossover(vector<vector<int>>& chromosomePool);
 
 public:
-	GA(int poolSize, std::string adjacencyMatrixPath);
+	GA(int poolSize, float mutationRate, std::string adjacencyMatrixPath);
 	~GA();
 	void runAlgorithm(int iterations);
 	float bruteForce();

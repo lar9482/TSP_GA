@@ -15,9 +15,10 @@ using std::cout;
 using std::endl;
 using std::map;
 
-GA::GA(int poolSize, string adjacencyMatrixPath):
+GA::GA(int poolSize, float mutationRate, string adjacencyMatrixPath):
     poolSize(poolSize), 
     chromosomeSize(-1), 
+    mutationRate(mutationRate),
     chromosomePool(make_unique<vector<vector<int>>>()),
     adjacencyMatrix(make_unique<vector<vector<int>>>())
 {
