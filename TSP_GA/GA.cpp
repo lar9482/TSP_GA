@@ -47,7 +47,8 @@ void GA::initializeChromosomePool() {
 void GA::initializeAdjacencyMatrix(string adjacencyMatrixPath) {
     std::ifstream file(adjacencyMatrixPath);
     if (!file.is_open()) {
-        std::cout << "Couldn't open file" << std::endl;
+        std::cerr << "Couldn't open file" << std::endl;
+        return;
     }
 
     string fileLine;
@@ -114,7 +115,6 @@ vector<vector<int>> GA::selection(vector<vector<int>> const& chromosomePool) {
 
     while(selectedChromosomes.size() < chromosomeSize) {
         float chance = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-        cout << chance << endl;
         float sumFitness = 0;
         for (auto iter = fitnessToChromosomeMap.begin(); iter != fitnessToChromosomeMap.end(); iter++) {
             float fitness = iter->first;
@@ -135,9 +135,29 @@ vector<vector<int>> GA::selection(vector<vector<int>> const& chromosomePool) {
     return selectedChromosomes;
 }
 
+void GA::singlePointCrossover(vector<int> const& firstChromo, vector<int> const& secondChromo) {
+    for (int i = 0; i < firstChromo.size(); i++) {
+        cout << firstChromo[i] << " " << endl;
+    }
+    cout << "\n" << endl;
+    for (int i = 0; i < secondChromo.size(); i++) {
+        cout << secondChromo[i] << " " << endl;
+    }
+    cout << "\n" << endl;
+}
+
+void GA::crossover(vector<vector<int>> const& chromosomePool) {
+    int halfwayIndex = static_cast<int>(chromosomeSize / 2);
+    for (int i = 0; i < halfwayIndex; i++) {
+        singlePointCrossover(chromosomePool[i], chromosomePool[i+halfwayIndex]);
+    }
+    auto test = chromosomePool[0];
+}
+
 void GA::runAlgorithm(int iterations) {
     float fitness = fitnessFunction(chromosomePool->at(0));
     vector<vector<int>> selectedChromosomes = selection(*chromosomePool);
+    crossover(selectedChromosomes);
 }
 
 float GA::bruteForce() {
