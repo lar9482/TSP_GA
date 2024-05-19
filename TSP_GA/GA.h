@@ -17,7 +17,7 @@ private:
 public:
 	GA(int poolSize, std::string adjacencyMatrixPath);
 	~GA();
-	void runAlgorithm();
+	void runAlgorithm(int iterations);
 	int bruteForce();
 };
 

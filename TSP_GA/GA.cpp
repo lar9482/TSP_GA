@@ -4,6 +4,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
+#include <random>
 
 using std::make_unique;
 using std::vector;
@@ -26,12 +28,17 @@ GA::~GA() {
 }
 
 void GA::initializeChromosomePool() {
+    // Ok, I copied the shuffling routine for stackoverflow.
+    // SRC: https://stackoverflow.com/questions/6926433/how-to-shuffle-a-stdvector
+    auto randomNumGen = std::default_random_engine();
     for (int i = 0; i < poolSize; i++) {
         vector<int> chromosome;
 
         for (int j = 0; j < chromosomeSize; j++) {
             chromosome.push_back(j);
         }
+
+        std::shuffle(std::begin(chromosome), std::end(chromosome), randomNumGen);
         chromosomePool->push_back(chromosome);
     }
 }
@@ -75,7 +82,7 @@ int GA::fitnessFunction(vector<int> const& chromosome) {
     return fitness;
 }
 
-void GA::runAlgorithm() {
+void GA::runAlgorithm(int iterations) {
     int fitness = fitnessFunction(chromosomePool->at(0));
 }
 

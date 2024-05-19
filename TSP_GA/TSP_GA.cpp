@@ -10,11 +10,12 @@ using std::string;
 
 int main() {
     int poolSize = 10;
+    int iterations = 100;
     string adjacencyMatrixPath = "DistanceMatrix_5.csv";
 
     GA geneticAlgo(poolSize, adjacencyMatrixPath);
-    geneticAlgo.bruteForce();
-    // geneticAlgo.runAlgorithm();
+    // geneticAlgo.bruteForce();
+    geneticAlgo.runAlgorithm(iterations);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
