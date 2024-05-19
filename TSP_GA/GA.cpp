@@ -78,3 +78,42 @@ int GA::fitnessFunction(vector<int> const& chromosome) {
 void GA::runAlgorithm() {
     int fitness = fitnessFunction(chromosomePool->at(0));
 }
+
+int GA::bruteForce() {
+    vector<vector<int>> allSolutions = generateAllPermutations(chromosomeSize);
+    int minimumFitness = INT_MAX;
+    for (int i = 0; i < allSolutions.size(); i++) {
+        auto test = allSolutions[i];
+        int fitness = fitnessFunction(allSolutions[i]);
+        if (fitness < minimumFitness) {
+            minimumFitness = fitness;
+        }
+    }
+    return minimumFitness;
+}
+
+vector<vector<int>> generateAllPermutations(int n) {
+    vector<vector<int>> generatedPerms;
+    vector<int> currPerm;
+    vector<int> nums;
+    
+    for (int i = 0; i < n; i++) {
+        nums.push_back(i);
+    }
+    generatePermutations(nums, 0, generatedPerms);
+
+    return generatedPerms;
+}
+
+void generatePermutations(vector<int>& nums, int start, vector<vector<int>>& result) {
+    if (start == nums.size()) {
+        result.push_back(nums);
+        return;
+    }
+
+    for (int i = start; i < nums.size(); ++i) {
+        std::swap(nums[start], nums[i]);
+        generatePermutations(nums, start + 1, result);
+        std::swap(nums[start], nums[i]);
+    }
+}

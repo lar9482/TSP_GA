@@ -13,7 +13,8 @@ int main() {
     string adjacencyMatrixPath = "DistanceMatrix_5.csv";
 
     GA geneticAlgo(poolSize, adjacencyMatrixPath);
-    geneticAlgo.runAlgorithm();
+    geneticAlgo.bruteForce();
+    // geneticAlgo.runAlgorithm();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

@@ -18,5 +18,8 @@ public:
 	GA(int poolSize, std::string adjacencyMatrixPath);
 	~GA();
 	void runAlgorithm();
+	int bruteForce();
 };
 
+std::vector<std::vector<int>> generateAllPermutations(int n);
+void generatePermutations(std::vector<int>& nums, int start, std::vector<std::vector<int>>& result);
