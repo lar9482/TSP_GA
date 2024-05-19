@@ -133,6 +133,9 @@
   <ItemGroup>
     <ClInclude Include="GA.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DistanceMatrix_5.csv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

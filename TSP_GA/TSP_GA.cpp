@@ -2,12 +2,18 @@
 //
 
 #include <iostream>
+#include <string>
 #include "GA.h"
+#include <fstream>
+
+using std::string;
 
 int main() {
     int poolSize = 10;
     int chromosomeSize = 30;
-    GA geneticAlgo(poolSize, chromosomeSize);
+    string adjacencyMatrixPath = "DistanceMatrix_5.csv";
+
+    GA geneticAlgo(poolSize, chromosomeSize, adjacencyMatrixPath);
     std::cout << "Hello World!\n";
 }
 
