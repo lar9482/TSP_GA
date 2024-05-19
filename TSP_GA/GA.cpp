@@ -83,11 +83,11 @@ float GA::fitnessFunction(vector<int> const& chromosome) {
     return fitness;
 }
 
-map<float, vector<vector<int>>> GA::calcRouletteFitness() {
+map<float, vector<vector<int>>> GA::calcRouletteFitness(vector<vector<int>> const& chromosomePool) {
     map<float, vector<vector<int>>> fitnessToChromosomeMap;
     float sumOfAllFitnesses = 0;
-    for (int i = 0; i < chromosomePool->size(); i++) {
-        vector<int> chromosome(chromosomePool->at(i));
+    for (int i = 0; i < chromosomePool.size(); i++) {
+        vector<int> chromosome(chromosomePool[i]);
         float fitness = fitnessFunction(chromosome);
         fitnessToChromosomeMap[fitness].push_back(chromosome);
 
@@ -108,15 +108,36 @@ map<float, vector<vector<int>>> GA::calcRouletteFitness() {
     return rouletteFitToChromosomeMap;
 }
 
-vector<vector<int>> GA::selection() {
-    map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness();
-    
-    return fitnessToChromosomeMap.begin()->second;
+vector<vector<int>> GA::selection(vector<vector<int>> const& chromosomePool) {
+    map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(chromosomePool);
+    vector<vector<int>> selectedChromosomes;
+
+    while(selectedChromosomes.size() < chromosomeSize) {
+        float chance = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+        cout << chance << endl;
+        float sumFitness = 0;
+        for (auto iter = fitnessToChromosomeMap.begin(); iter != fitnessToChromosomeMap.end(); iter++) {
+            float fitness = iter->first;
+            vector<vector<int>> chromosomes = iter->second;
+
+            sumFitness += fitness;
+            if (chance < sumFitness) {
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<> dis(0, chromosomes.size() - 1);
+                vector<int> selectedChromosome = chromosomes[dis(gen)];
+                selectedChromosomes.push_back(selectedChromosome);
+                break;
+            }
+        }
+    }
+
+    return selectedChromosomes;
 }
 
 void GA::runAlgorithm(int iterations) {
     float fitness = fitnessFunction(chromosomePool->at(0));
-    selection();
+    vector<vector<int>> selectedChromosomes = selection(*chromosomePool);
 }
 
 float GA::bruteForce() {

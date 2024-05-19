@@ -15,9 +15,9 @@ private:
 	void initializeChromosomePool();
 	void initializeAdjacencyMatrix(std::string adjacencyMatrixPath);
 	float fitnessFunction(std::vector<int> const& chromosome);
-	std::map<float, std::vector<std::vector<int>>> calcRouletteFitness();
+	std::map<float, std::vector<std::vector<int>>> calcRouletteFitness(std::vector<std::vector<int>> const& chromosomePool);
 
-	std::vector<std::vector<int>> selection();
+	std::vector<std::vector<int>> selection(std::vector<std::vector<int>> const& chromosomePool);
 
 public:
 	GA(int poolSize, std::string adjacencyMatrixPath);
