@@ -6,7 +6,8 @@
 
 int main() {
     int poolSize = 10;
-    GA geneticAlgo(poolSize);
+    int chromosomeSize = 30;
+    GA geneticAlgo(poolSize, chromosomeSize);
     std::cout << "Hello World!\n";
 }
 

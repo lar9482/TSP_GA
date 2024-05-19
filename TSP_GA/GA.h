@@ -5,10 +5,12 @@
 class GA
 {
 private:
-	std::unique_ptr< std::vector<std::vector<int>> > pool;
+	std::unique_ptr< std::vector<std::vector<int>> > chromosomePool;
+	
 	int poolSize;
+	int chromosomeSize;
 public:
-	GA(int poolSize);
+	GA(int poolSize, int chromosomeSize);
 	~GA();
 };
 
