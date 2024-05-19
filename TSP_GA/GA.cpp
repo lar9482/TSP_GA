@@ -12,6 +12,7 @@ using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
+using std::map;
 
 GA::GA(int poolSize, string adjacencyMatrixPath):
     poolSize(poolSize), 
@@ -73,8 +74,8 @@ void GA::initializeAdjacencyMatrix(string adjacencyMatrixPath) {
     }
 }
 
-int GA::fitnessFunction(vector<int> const& chromosome) {
-    int fitness = 0;
+float GA::fitnessFunction(vector<int> const& chromosome) {
+    float fitness = 0;
     for (int i = 0; i < chromosomeSize - 1; i++) {
         fitness += adjacencyMatrix->at(chromosome[i])[chromosome[i + 1]];
     }
@@ -82,16 +83,48 @@ int GA::fitnessFunction(vector<int> const& chromosome) {
     return fitness;
 }
 
-void GA::runAlgorithm(int iterations) {
-    int fitness = fitnessFunction(chromosomePool->at(0));
+map<float, vector<vector<int>>> GA::calcRouletteFitness() {
+    map<float, vector<vector<int>>> fitnessToChromosomeMap;
+    float sumOfAllFitnesses = 0;
+    for (int i = 0; i < chromosomePool->size(); i++) {
+        vector<int> chromosome(chromosomePool->at(i));
+        float fitness = fitnessFunction(chromosome);
+        fitnessToChromosomeMap[fitness].push_back(chromosome);
+
+        // fitness was not found as a key in 'fitnessToChromosomeMap'
+        if (fitnessToChromosomeMap.find(fitness) != fitnessToChromosomeMap.end()) {
+            sumOfAllFitnesses += fitness;
+        }
+    }
+    map<float, vector<vector<int>>> rouletteFitToChromosomeMap;
+    for (auto iter = fitnessToChromosomeMap.begin(); iter != fitnessToChromosomeMap.end(); iter++) {
+        float fitness = iter->first;
+        vector<vector<int>> chromosomes = iter->second;
+        float rouletteFitness = fitness / sumOfAllFitnesses;
+
+        rouletteFitToChromosomeMap[rouletteFitness] = chromosomes;
+    }
+
+    return rouletteFitToChromosomeMap;
 }
 
-int GA::bruteForce() {
+vector<vector<int>> GA::selection() {
+    map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness();
+    
+    return fitnessToChromosomeMap.begin()->second;
+}
+
+void GA::runAlgorithm(int iterations) {
+    float fitness = fitnessFunction(chromosomePool->at(0));
+    selection();
+}
+
+float GA::bruteForce() {
     vector<vector<int>> allSolutions = generateAllPermutations(chromosomeSize);
-    int minimumFitness = INT_MAX;
+    float minimumFitness = INT_MAX;
     for (int i = 0; i < allSolutions.size(); i++) {
         auto test = allSolutions[i];
-        int fitness = fitnessFunction(allSolutions[i]);
+        float fitness = fitnessFunction(allSolutions[i]);
         if (fitness < minimumFitness) {
             minimumFitness = fitness;
         }
