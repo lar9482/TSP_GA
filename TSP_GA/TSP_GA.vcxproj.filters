@@ -31,6 +31,8 @@
     <None Include="DistanceMatrix_5.csv">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="DistanceMatrix_100.csv" />
+    <None Include="DistanceMatrix_100.csv">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

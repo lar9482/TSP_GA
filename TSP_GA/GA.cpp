@@ -11,9 +11,9 @@ using std::string;
 using std::cout;
 using std::endl;
 
-GA::GA(int poolSize, int chromosomeSize, string adjacencyMatrixPath):
+GA::GA(int poolSize, string adjacencyMatrixPath):
     poolSize(poolSize), 
-    chromosomeSize(chromosomeSize), 
+    chromosomeSize(-1), 
     chromosomePool(make_unique<vector<vector<int>>>()),
     adjacencyMatrix(make_unique<vector<vector<int>>>())
 {
@@ -59,5 +59,22 @@ void GA::initializeAdjacencyMatrix(string adjacencyMatrixPath) {
         }
         matrixRow.push_back(std::stoi(currNum));
         adjacencyMatrix->push_back(matrixRow);
+        
+        if (chromosomeSize == -1) {
+            chromosomeSize = matrixRow.size();
+        }
     }
+}
+
+int GA::fitnessFunction(vector<int> const& chromosome) {
+    int fitness = 0;
+    for (int i = 0; i < chromosomeSize - 1; i++) {
+        fitness += adjacencyMatrix->at(i)[i+1];
+    }
+    fitness += adjacencyMatrix->at(chromosomeSize - 1)[0];
+    return fitness;
+}
+
+void GA::runAlgorithm() {
+    int fitness = fitnessFunction(chromosomePool->at(0));
 }

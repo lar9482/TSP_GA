@@ -12,9 +12,11 @@ private:
 	int chromosomeSize;
 	void initializeChromosomePool();
 	void initializeAdjacencyMatrix(std::string adjacencyMatrixPath);
+	int fitnessFunction(std::vector<int> const& chromosome);
 
 public:
-	GA(int poolSize, int chromosomeSize, std::string adjacencyMatrixPath);
+	GA(int poolSize, std::string adjacencyMatrixPath);
 	~GA();
+	void runAlgorithm();
 };
 
