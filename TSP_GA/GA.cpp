@@ -69,9 +69,9 @@ void GA::initializeAdjacencyMatrix(string adjacencyMatrixPath) {
 int GA::fitnessFunction(vector<int> const& chromosome) {
     int fitness = 0;
     for (int i = 0; i < chromosomeSize - 1; i++) {
-        fitness += adjacencyMatrix->at(i)[i+1];
+        fitness += adjacencyMatrix->at(chromosome[i])[chromosome[i + 1]];
     }
-    fitness += adjacencyMatrix->at(chromosomeSize - 1)[0];
+    fitness += adjacencyMatrix->at(chromosome[chromosomeSize - 1])[chromosome[0]];
     return fitness;
 }
 
