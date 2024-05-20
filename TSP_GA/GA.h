@@ -23,11 +23,13 @@ private:
 	float fitnessFunction(std::vector<int> const& chromosome);
 	map<float, vector<vector<int>>> calcRouletteFitness(vector<vector<int>> const& chromosomePool);
 	vector<int> orderCrossover(vector<int>& firstChromo, vector<int>& secondChromo);
+	vector<vector<int>> getEliteChromosomes(map<float, vector<vector<int>>> const& fitnessToChromosomeMap);
 
 	vector<vector<int>> selection(map<float, vector<vector<int>>> const& fitnessToChromosomeMap);
-	void crossover(vector<vector<int>>& chromosomePool);
+	void crossover(vector<vector<int>>& chromosomePool, map<float, vector<vector<int>>> const& fitnessToChromosomeMap);
 	void mutation(vector<int>& chromosome);
-
+	
+	float getBestFitnessFromPool(vector<vector<int>> const& chromosomePool);
 public:
 	GA(int poolSize, float mutationRate, std::string adjacencyMatrixPath);
 	~GA();

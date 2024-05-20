@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <random>
 #include <cstdlib>
+#include <limits>
 
 using std::make_unique;
 using std::vector;
@@ -86,6 +87,8 @@ float GA::fitnessFunction(vector<int> const& chromosome) {
     return fitness;
 }
 
+//BUG!!!:
+//This fitness routine will favor fitness values that are higher, which is NOT what I want.
 map<float, vector<vector<int>>> GA::calcRouletteFitness(vector<vector<int>> const& chromosomePool) {
     map<float, vector<vector<int>>> fitnessToChromosomeMap;
     float sumOfAllFitnesses = 0;
@@ -103,7 +106,7 @@ map<float, vector<vector<int>>> GA::calcRouletteFitness(vector<vector<int>> cons
     for (auto iter = fitnessToChromosomeMap.begin(); iter != fitnessToChromosomeMap.end(); iter++) {
         float fitness = iter->first;
         vector<vector<int>> chromosomes = iter->second;
-        float rouletteFitness = fitness / sumOfAllFitnesses;
+        float rouletteFitness = (1 - fitness / sumOfAllFitnesses);
 
         rouletteFitToChromosomeMap[rouletteFitness] = chromosomes;
     }
@@ -114,7 +117,7 @@ map<float, vector<vector<int>>> GA::calcRouletteFitness(vector<vector<int>> cons
 vector<vector<int>> GA::selection(map<float, vector<vector<int>>> const&  fitnessToChromosomeMap) {
     vector<vector<int>> selectedChromosomes;
 
-    while(selectedChromosomes.size() < chromosomeSize) {
+    while(selectedChromosomes.size() < poolSize) {
         float chance = randomFloat(0, 1);
         float sumFitness = 0;
         for (auto iter = fitnessToChromosomeMap.begin(); iter != fitnessToChromosomeMap.end(); iter++) {
@@ -176,13 +179,42 @@ vector<int> GA::orderCrossover(vector<int>& firstChromo, vector<int>& secondChro
     return newChromosome;
 }
 
-void GA::crossover(vector<vector<int>>& chromosomePool) {
-    int halfwayIndex = static_cast<int>(chromosomeSize / 2);
+vector<vector<int>> GA::getEliteChromosomes(map<float, vector<vector<int>>> const& fitnessToChromosomeMap) {
+    auto bestFitnessIter = fitnessToChromosomeMap.rbegin();
+    vector<vector<int>> fittestChromosomes = bestFitnessIter->second;
+    vector<vector<int>> eliteChromosomesToReturn;
+
+    if (fittestChromosomes.size() >= 2) {
+        eliteChromosomesToReturn.push_back(fittestChromosomes[0]);
+        eliteChromosomesToReturn.push_back(fittestChromosomes[1]);
+        return eliteChromosomesToReturn;
+    }
+    else {
+        bestFitnessIter++;
+        vector<vector<int>> secondFittestChromosomes = bestFitnessIter->second;
+        eliteChromosomesToReturn.push_back(fittestChromosomes[0]);
+        eliteChromosomesToReturn.push_back(secondFittestChromosomes[0]);
+        
+        return eliteChromosomesToReturn;
+    }
+}
+
+void GA::crossover(vector<vector<int>>& chromosomePool, map<float, vector<vector<int>>> const& fitnessToChromosomeMap) {
+    int halfwayIndex = static_cast<int>(poolSize / 2);
     for (int i = 0; i < halfwayIndex; i++) {
-        vector<int> firstChild = orderCrossover(chromosomePool[i], chromosomePool[i + halfwayIndex]);
-        vector<int> secondChild = orderCrossover(chromosomePool[i], chromosomePool[i + halfwayIndex]);
-        chromosomePool[i] = firstChild;
-        chromosomePool[i + halfwayIndex] = secondChild;
+        if (i == 0) {
+            vector<vector<int>> eliteChromosomes = getEliteChromosomes(fitnessToChromosomeMap);
+            vector<int> firstChild = eliteChromosomes[0];
+            vector<int> secondChild = eliteChromosomes[1];
+            chromosomePool[i] = firstChild;
+            chromosomePool[i + halfwayIndex] = secondChild;
+        }
+        else {
+            vector<int> firstChild = orderCrossover(chromosomePool[i], chromosomePool[i + halfwayIndex]);
+            vector<int> secondChild = orderCrossover(chromosomePool[i], chromosomePool[i + halfwayIndex]);
+            chromosomePool[i] = firstChild;
+            chromosomePool[i + halfwayIndex] = secondChild;
+        }
     }
 }
 
@@ -196,31 +228,46 @@ void GA::mutation(vector<int>& chromosome) {
     std::swap(chromosome[firstPoint], chromosome[secondPoint]);
 }
 
-void GA::runAlgorithm(int iterations) {
-    map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(*chromosomePool);
-
-    vector<vector<int>> selectedChromosomes = selection(fitnessToChromosomeMap);
-    crossover(selectedChromosomes);
-    float chance = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-
-    for (int i = 0; i < chromosomeSize; i++) {
-        if (chance < mutationRate) {
-            mutation(selectedChromosomes[i]);
-        }
-    }
-}
-
-float GA::bruteForce() {
-    vector<vector<int>> allSolutions = generateAllPermutations(chromosomeSize);
-    float minimumFitness = INT_MAX;
-    for (int i = 0; i < allSolutions.size(); i++) {
-        auto test = allSolutions[i];
-        float fitness = fitnessFunction(allSolutions[i]);
+float GA::getBestFitnessFromPool(vector<vector<int>> const& chromosomePool) {
+    float minimumFitness = std::numeric_limits<float>::max();
+    for (int i = 0; i < chromosomePool.size(); i++) {
+        float fitness = fitnessFunction(chromosomePool[i]);
         if (fitness < minimumFitness) {
             minimumFitness = fitness;
         }
     }
     return minimumFitness;
+}
+
+void GA::runAlgorithm(int iterations) {
+    for (int iteration = 0; iteration < iterations; iteration++) {
+        map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(*chromosomePool);
+
+        vector<vector<int>> newChromosomePool = selection(fitnessToChromosomeMap);
+        crossover(newChromosomePool, fitnessToChromosomeMap);
+
+        for (int i = 0; i < poolSize; i++) {
+            float chance = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+            if (chance < mutationRate) {
+                mutation(newChromosomePool[i]);
+            }
+        }
+
+        for (int i = 0; i < poolSize; i++) {
+            chromosomePool->at(i) = newChromosomePool[i];
+        }
+        
+        cout << getBestFitnessFromPool(*chromosomePool) << endl;
+        if (getBestFitnessFromPool(*chromosomePool) <= 270) {
+            cout << getBestFitnessFromPool(*chromosomePool) << endl;
+        }
+    }
+    
+}
+
+float GA::bruteForce() {
+    vector<vector<int>> allSolutions = generateAllPermutations(chromosomeSize);
+    return getBestFitnessFromPool(allSolutions);
 }
 
 vector<vector<int>> generateAllPermutations(int n) {
@@ -262,7 +309,7 @@ float randomFloat(float min, float max) {
     static std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(min, max);
 
-    return dis(gen);
+    return static_cast<float>(dis(gen));
 }
 
 bool numIsInIntVector(int num, vector<int> const& vec) {
