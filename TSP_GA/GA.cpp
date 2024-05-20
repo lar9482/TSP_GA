@@ -136,21 +136,53 @@ vector<vector<int>> GA::selection(map<float, vector<vector<int>>> const&  fitnes
 
 //THIS IS WRONG RIGHT NOW:
 //DO THIS INSTEAD: https://mat.uab.cat/~alseda/MasterOpt/GeneticOperations.pdf
-void GA::orderCrossover(vector<int>& firstChromo, vector<int>& secondChromo) {
-    int firstSplicePoint = static_cast<int>(rand() % (chromosomeSize-2));
-    int secondSplicePoint = static_cast<int>(rand() % (chromosomeSize-firstSplicePoint) + firstSplicePoint);
-    cout << "" << endl;
-    // for (int i = 0; i < chromosomeSize; i++) {
-    //     if (splicePoint < i) {
-    //         std::swap(firstChromo[i], secondChromo[i]);
-    //     }
-    // }
+vector<int> GA::orderCrossover(vector<int>& firstChromo, vector<int>& secondChromo) {
+    int firstSplicePoint = randomInteger(0, chromosomeSize - 2);
+    int secondSplicePoint = randomInteger(firstSplicePoint, chromosomeSize - 1);
+    
+    vector<int> firstChromoSubstring;
+    vector<int> secondChromoSubstring;
+    for (int i = firstSplicePoint; i <= secondSplicePoint; i++) {
+        firstChromoSubstring.push_back(
+            firstChromo[i]
+        );
+    }
+    for (int i = 0; i < chromosomeSize; i++) {
+        if (!numIsInIntVector(secondChromo[i], firstChromoSubstring)) {
+            secondChromoSubstring.push_back(
+                secondChromo[i]
+            );
+        }
+    }
+
+    vector<int> newChromosome;
+    int firstChromoSubstringIndex = 0;
+    int secondChromoSubstringIndex = 0;
+    for (int i = 0; i < chromosomeSize; i++) {
+        if (i >= firstSplicePoint && i <= secondSplicePoint) {
+            newChromosome.push_back(
+                firstChromoSubstring[firstChromoSubstringIndex]
+            );
+            firstChromoSubstringIndex++;
+        }
+        else {
+            newChromosome.push_back(
+                secondChromoSubstring[secondChromoSubstringIndex]
+            );
+            secondChromoSubstringIndex++;
+        }
+    }
+    
+    return newChromosome;
 }
 
 void GA::crossover(vector<vector<int>>& chromosomePool) {
     int halfwayIndex = static_cast<int>(chromosomeSize / 2);
     for (int i = 0; i < halfwayIndex; i++) {
-        orderCrossover(chromosomePool[i], chromosomePool[i+halfwayIndex]);
+        vector<int> firstChild = orderCrossover(chromosomePool[i], chromosomePool[i + halfwayIndex]);
+        vector<int> secondChild = orderCrossover(chromosomePool[i], chromosomePool[i + halfwayIndex]);
+        chromosomePool[i] = firstChild;
+        chromosomePool[i + halfwayIndex] = secondChild;
     }
 }
 
@@ -231,4 +263,9 @@ float randomFloat(float min, float max) {
     std::uniform_real_distribution<> dis(min, max);
 
     return dis(gen);
+}
+
+bool numIsInIntVector(int num, vector<int> const& vec) {
+    auto iter = std::find(vec.begin(), vec.end(), num);
+    return (iter != vec.end());
 }
