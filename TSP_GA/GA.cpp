@@ -92,21 +92,25 @@ float GA::fitnessFunction(vector<int> const& chromosome) {
 map<float, vector<vector<int>>> GA::calcRouletteFitness(vector<vector<int>> const& chromosomePool) {
     map<float, vector<vector<int>>> fitnessToChromosomeMap;
     float sumOfAllFitnesses = 0;
+
     for (int i = 0; i < chromosomePool.size(); i++) {
         vector<int> chromosome(chromosomePool[i]);
         float fitness = fitnessFunction(chromosome);
-        fitnessToChromosomeMap[fitness].push_back(chromosome);
+        float invertedFitness = 1/fitness;
+        fitnessToChromosomeMap[invertedFitness].push_back(chromosome);
 
         // fitness was not found as a key in 'fitnessToChromosomeMap'
-        if (fitnessToChromosomeMap.find(fitness) != fitnessToChromosomeMap.end()) {
-            sumOfAllFitnesses += fitness;
+        if (fitnessToChromosomeMap.find(invertedFitness) != fitnessToChromosomeMap.end()) {
+            sumOfAllFitnesses += invertedFitness;
         }
     }
+
     map<float, vector<vector<int>>> rouletteFitToChromosomeMap;
     for (auto iter = fitnessToChromosomeMap.begin(); iter != fitnessToChromosomeMap.end(); iter++) {
         float fitness = iter->first;
+        
         vector<vector<int>> chromosomes = iter->second;
-        float rouletteFitness = (1 - fitness / sumOfAllFitnesses);
+        float rouletteFitness = (fitness / sumOfAllFitnesses);
 
         rouletteFitToChromosomeMap[rouletteFitness] = chromosomes;
     }
