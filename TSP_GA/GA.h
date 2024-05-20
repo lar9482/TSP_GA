@@ -29,14 +29,14 @@ private:
 	void crossover(vector<vector<int>>& chromosomePool, map<float, vector<vector<int>>> const& fitnessToChromosomeMap);
 	void mutation(vector<int>& chromosome);
 	
-	float getBestFitnessFromPool(vector<vector<int>> const& chromosomePool);
+	std::pair<float, vector<int>> getBestFitnessFromPool(vector<vector<int>> const& chromosomePool);
 	void printBestChromosome(vector<vector<int>> const& chromosomePool);
 
 public:
 	GA(int poolSize, float mutationRate, std::string adjacencyMatrixPath);
 	~GA();
 	void runAlgorithm(int iterations);
-	float bruteForce();
+	std::pair<float, vector<int>> bruteForce();
 };
 
 vector<vector<int>> generateAllPermutations(int n);

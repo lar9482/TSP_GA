@@ -232,15 +232,21 @@ void GA::mutation(vector<int>& chromosome) {
     std::swap(chromosome[firstPoint], chromosome[secondPoint]);
 }
 
-float GA::getBestFitnessFromPool(vector<vector<int>> const& chromosomePool) {
+std::pair<float, vector<int>> GA::getBestFitnessFromPool(vector<vector<int>> const& chromosomePool) {
     float minimumFitness = std::numeric_limits<float>::max();
+    vector<int> bestChromosome;
     for (int i = 0; i < chromosomePool.size(); i++) {
         float fitness = fitnessFunction(chromosomePool[i]);
         if (fitness < minimumFitness) {
+            bestChromosome = chromosomePool[i];
             minimumFitness = fitness;
         }
     }
-    return minimumFitness;
+    std::pair<float, vector<int>> fitnessAndChromosomePair;
+    fitnessAndChromosomePair.first = minimumFitness;
+    fitnessAndChromosomePair.second = bestChromosome;
+
+    return fitnessAndChromosomePair;
 }
 
 void GA::printBestChromosome(vector<vector<int>> const& chromosomePool) {
@@ -257,10 +263,12 @@ void GA::printBestChromosome(vector<vector<int>> const& chromosomePool) {
     for (int i = 0; i < bestChromosome.size(); i++) {
         cout << bestChromosome[i] << "->";
     }
-    cout << "\n" << endl;
+    cout << bestChromosome[0] << endl;
 }
 
 void GA::runAlgorithm(int iterations) {
+    float bestFitness = std::numeric_limits<float>::max();
+    vector<int> bestChromosome;
     for (int iteration = 0; iteration < iterations; iteration++) {
         map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(*chromosomePool);
 
@@ -278,16 +286,22 @@ void GA::runAlgorithm(int iterations) {
             chromosomePool->at(i) = newChromosomePool[i];
         }
         
-        cout << getBestFitnessFromPool(*chromosomePool) << endl;
-        if (getBestFitnessFromPool(*chromosomePool) <= 270) {
-            cout << getBestFitnessFromPool(*chromosomePool) << endl;
+        std::pair<float, vector<int>> fitnessAndChromosomePair = getBestFitnessFromPool(*chromosomePool);
+        if (fitnessAndChromosomePair.first < bestFitness) {
+            bestFitness = fitnessAndChromosomePair.first;
+            bestChromosome = fitnessAndChromosomePair.second;
         }
+        cout << fitnessAndChromosomePair.first << endl;
     }
     
-    printBestChromosome(*chromosomePool);
+    for (int i = 0; i < bestChromosome.size(); i++) {
+        cout << bestChromosome[i] << "->";
+    }
+    cout << bestChromosome[0] << endl;
+    cout << bestFitness << endl;
 }
 
-float GA::bruteForce() {
+std::pair<float, vector<int>> GA::bruteForce() {
     vector<vector<int>> allSolutions = generateAllPermutations(chromosomeSize);
     printBestChromosome(allSolutions);
     return getBestFitnessFromPool(allSolutions);
