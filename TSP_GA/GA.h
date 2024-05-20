@@ -22,10 +22,11 @@ private:
 	void initializeAdjacencyMatrix(string adjacencyMatrixPath);
 	float fitnessFunction(std::vector<int> const& chromosome);
 	map<float, vector<vector<int>>> calcRouletteFitness(vector<vector<int>> const& chromosomePool);
-	void singlePointCrossover(vector<int>& firstChromo, vector<int>& secondChromo);
+	void orderCrossover(vector<int>& firstChromo, vector<int>& secondChromo);
 
 	vector<vector<int>> selection(map<float, vector<vector<int>>> const& fitnessToChromosomeMap);
 	void crossover(vector<vector<int>>& chromosomePool);
+	void mutation(vector<int>& chromosome);
 
 public:
 	GA(int poolSize, float mutationRate, std::string adjacencyMatrixPath);
@@ -36,3 +37,5 @@ public:
 
 vector<vector<int>> generateAllPermutations(int n);
 void generatePermutations(vector<int>& nums, int start, vector<vector<int>>& result);
+int randomInteger(int min, int max);
+float randomFloat(float min, float max);

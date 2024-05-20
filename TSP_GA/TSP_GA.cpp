@@ -11,9 +11,10 @@ using std::string;
 int main() {
     int poolSize = 10;
     int iterations = 100;
+    float mutationRate = 0.7;
     string adjacencyMatrixPath = "DistanceMatrix_5.csv";
 
-    GA geneticAlgo(poolSize, adjacencyMatrixPath);
-    // geneticAlgo.bruteForce();
+    GA geneticAlgo(poolSize, mutationRate, adjacencyMatrixPath);
+    //geneticAlgo.bruteForce();
     geneticAlgo.runAlgorithm(iterations);
 }

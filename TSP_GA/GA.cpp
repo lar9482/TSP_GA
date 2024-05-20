@@ -112,11 +112,10 @@ map<float, vector<vector<int>>> GA::calcRouletteFitness(vector<vector<int>> cons
 }
 
 vector<vector<int>> GA::selection(map<float, vector<vector<int>>> const&  fitnessToChromosomeMap) {
-    // map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(chromosomePool);
     vector<vector<int>> selectedChromosomes;
 
     while(selectedChromosomes.size() < chromosomeSize) {
-        float chance = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+        float chance = randomFloat(0, 1);
         float sumFitness = 0;
         for (auto iter = fitnessToChromosomeMap.begin(); iter != fitnessToChromosomeMap.end(); iter++) {
             float fitness = iter->first;
@@ -124,11 +123,7 @@ vector<vector<int>> GA::selection(map<float, vector<vector<int>>> const&  fitnes
 
             sumFitness += fitness;
             if (chance < sumFitness) {
-                // std::random_device rd;
-                // std::mt19937 gen(rd());
-                // std::uniform_int_distribution<> dis(0, chromosomes.size() - 1);  
-                // vector<int> selectedChromosome = chromosomes[dis(gen)];
-                int index = static_cast<int>(rand() % (chromosomes.size()));
+                int index = randomInteger(0, chromosomes.size() - 1);
                 vector<int> selectedChromosome = chromosomes[index];
                 selectedChromosomes.push_back(selectedChromosome);
                 break;
@@ -139,20 +134,34 @@ vector<vector<int>> GA::selection(map<float, vector<vector<int>>> const&  fitnes
     return selectedChromosomes;
 }
 
-void GA::singlePointCrossover(vector<int>& firstChromo, vector<int>& secondChromo) {
-    int splicePoint = static_cast<int>(rand() % (chromosomeSize));
-    for (int i = 0; i < chromosomeSize; i++) {
-        if (splicePoint < i) {
-            std::swap(firstChromo[i], secondChromo[i]);
-        }
-    }
+//THIS IS WRONG RIGHT NOW:
+//DO THIS INSTEAD: https://mat.uab.cat/~alseda/MasterOpt/GeneticOperations.pdf
+void GA::orderCrossover(vector<int>& firstChromo, vector<int>& secondChromo) {
+    int firstSplicePoint = static_cast<int>(rand() % (chromosomeSize-2));
+    int secondSplicePoint = static_cast<int>(rand() % (chromosomeSize-firstSplicePoint) + firstSplicePoint);
+    cout << "" << endl;
+    // for (int i = 0; i < chromosomeSize; i++) {
+    //     if (splicePoint < i) {
+    //         std::swap(firstChromo[i], secondChromo[i]);
+    //     }
+    // }
 }
 
 void GA::crossover(vector<vector<int>>& chromosomePool) {
     int halfwayIndex = static_cast<int>(chromosomeSize / 2);
     for (int i = 0; i < halfwayIndex; i++) {
-        singlePointCrossover(chromosomePool[i], chromosomePool[i+halfwayIndex]);
+        orderCrossover(chromosomePool[i], chromosomePool[i+halfwayIndex]);
     }
+}
+
+void GA::mutation(vector<int>& chromosome) {
+    int firstPoint = static_cast<int>(rand() % (chromosome.size()));
+    int secondPoint = static_cast<int>(rand() % (chromosome.size()));
+    while (secondPoint == firstPoint) {
+        secondPoint = static_cast<int>(rand() % (chromosome.size()));
+    }
+
+    std::swap(chromosome[firstPoint], chromosome[secondPoint]);
 }
 
 void GA::runAlgorithm(int iterations) {
@@ -160,6 +169,13 @@ void GA::runAlgorithm(int iterations) {
 
     vector<vector<int>> selectedChromosomes = selection(fitnessToChromosomeMap);
     crossover(selectedChromosomes);
+    float chance = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+
+    for (int i = 0; i < chromosomeSize; i++) {
+        if (chance < mutationRate) {
+            mutation(selectedChromosomes[i]);
+        }
+    }
 }
 
 float GA::bruteForce() {
@@ -199,4 +215,20 @@ void generatePermutations(vector<int>& nums, int start, vector<vector<int>>& res
         generatePermutations(nums, start + 1, result);
         std::swap(nums[start], nums[i]);
     }
+}
+
+int randomInteger(int min, int max) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(min, max);
+
+    return dis(gen);
+}
+
+float randomFloat(float min, float max) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(min, max);
+
+    return dis(gen);
 }
