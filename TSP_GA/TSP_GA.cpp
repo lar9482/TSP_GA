@@ -9,13 +9,14 @@
 using std::string;
 
 int main() {
-    int poolSize = 100;
+    int poolSize = 150;
     int iterations = 1000;
     float mutationRate = 0.05;
     string adjacencyMatrixPath = "DistanceMatrix_100.csv";
 
     GA geneticAlgo(poolSize, mutationRate, adjacencyMatrixPath);
     geneticAlgo.runAlgorithm(iterations);
+
     // float bestScore = geneticAlgo.bruteForce();
     // std::cout << bestScore << std::endl;
 }

@@ -243,6 +243,23 @@ float GA::getBestFitnessFromPool(vector<vector<int>> const& chromosomePool) {
     return minimumFitness;
 }
 
+void GA::printBestChromosome(vector<vector<int>> const& chromosomePool) {
+    float minimumFitness = std::numeric_limits<float>::max();
+    vector<int> bestChromosome;
+    for (int i = 0; i < chromosomePool.size(); i++) {
+        float fitness = fitnessFunction(chromosomePool[i]);
+        if (fitness < minimumFitness) {
+            minimumFitness = fitness;
+            bestChromosome = chromosomePool[i];
+        }
+    }
+
+    for (int i = 0; i < bestChromosome.size(); i++) {
+        cout << bestChromosome[i] << "->";
+    }
+    cout << "\n" << endl;
+}
+
 void GA::runAlgorithm(int iterations) {
     for (int iteration = 0; iteration < iterations; iteration++) {
         map<float, vector<vector<int>>> fitnessToChromosomeMap = calcRouletteFitness(*chromosomePool);
@@ -267,10 +284,12 @@ void GA::runAlgorithm(int iterations) {
         }
     }
     
+    printBestChromosome(*chromosomePool);
 }
 
 float GA::bruteForce() {
     vector<vector<int>> allSolutions = generateAllPermutations(chromosomeSize);
+    printBestChromosome(allSolutions);
     return getBestFitnessFromPool(allSolutions);
 }
 

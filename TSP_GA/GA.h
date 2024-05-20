@@ -30,6 +30,8 @@ private:
 	void mutation(vector<int>& chromosome);
 	
 	float getBestFitnessFromPool(vector<vector<int>> const& chromosomePool);
+	void printBestChromosome(vector<vector<int>> const& chromosomePool);
+
 public:
 	GA(int poolSize, float mutationRate, std::string adjacencyMatrixPath);
 	~GA();
